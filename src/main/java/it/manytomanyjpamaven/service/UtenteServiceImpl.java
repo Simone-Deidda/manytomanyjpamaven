@@ -268,12 +268,34 @@ public class UtenteServiceImpl implements UtenteService {
 
 	@Override
 	public List<Utente> listAllUtentiConPasswordConMenoDiOttoCaratteri() throws Exception {
-		return null;
+		EntityManager entityManager = EntityManagerUtil.getEntityManager();
+
+		try {
+			utenteDAO.setEntityManager(entityManager);
+			return utenteDAO.listAllWithShortPassword();
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw e;
+		} finally {
+			EntityManagerUtil.closeEntityManager(entityManager);
+		}
 	}
 
 	@Override
 	public boolean cercaSeTraGliUtentiDisabilitatiCEUnAdmin() throws Exception {
-		return false;
+		EntityManager entityManager = EntityManagerUtil.getEntityManager();
+
+		try {
+			utenteDAO.setEntityManager(entityManager);
+			return utenteDAO.listErrorDisabledAdmin();
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw e;
+		} finally {
+			EntityManagerUtil.closeEntityManager(entityManager);
+		}
 	}
 
 }

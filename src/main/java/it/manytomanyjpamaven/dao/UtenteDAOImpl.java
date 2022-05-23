@@ -80,4 +80,16 @@ public class UtenteDAOImpl implements UtenteDAO {
 		return query.getResultList().size();
 	}
 
+	@Override
+	public List<Utente> listAllWithShortPassword() {
+		TypedQuery<Utente> query = entityManager.createQuery("FROM Utente u WHERE u.password NOT LIKE '________%'", Utente.class);
+		return query.getResultList();
+	}
+
+	@Override
+	public boolean listErrorDisabledAdmin() {
+		TypedQuery<Utente> query = entityManager.createQuery("SELECT u FROM Utente u JOIN u.ruoli r WHERE r.codice = 'ROLE_ADMIN' AND u.stato = 'DISABILITATO'", Utente.class);
+		return query.getResultList().isEmpty();
+	}
+
 }

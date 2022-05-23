@@ -23,9 +23,7 @@ public class ManyToManyTest {
 		// ora passo alle operazioni CRUD
 		try {
 
-			// inizializzo i ruoli sul db
-			initRuoli(ruoloServiceInstance);
-
+			// inizializzo i ruoli sul db initRuoli(ruoloServiceInstance);
 			System.out.println("In tabella Utente ci sono " + utenteServiceInstance.listAll().size() + " elementi.");
 
 			testInserisciNuovoUtente(utenteServiceInstance);
@@ -65,6 +63,12 @@ public class ManyToManyTest {
 			System.out.println("In tabella Utente ci sono " + utenteServiceInstance.listAll().size() + " elementi.");
 
 			testContaUtentiAdmin(utenteServiceInstance, ruoloServiceInstance);
+			System.out.println("In tabella Utente ci sono " + utenteServiceInstance.listAll().size() + " elementi.");
+
+			testTrovaUtentiConPAssowordPiuCortaDiOttoCaratteri(utenteServiceInstance);
+			System.out.println("In tabella Utente ci sono " + utenteServiceInstance.listAll().size() + " elementi.");
+
+			testTrovaSeCiSonoUtentiAdminEDisabilitati(utenteServiceInstance, ruoloServiceInstance);
 			System.out.println("In tabella Utente ci sono " + utenteServiceInstance.listAll().size() + " elementi.");
 
 		} catch (Throwable e) {
@@ -326,11 +330,11 @@ public class ManyToManyTest {
 
 	private static void testContaUtentiAdmin(UtenteService utenteServiceInstance, RuoloService ruoloServiceInstance)
 			throws Exception {
-		System.out.println(".......testTrovaUtentiCreatiAGiugno2021 inizio.............");
+		System.out.println(".......testContaUtentiAdmin inizio.............");
 
 		Ruolo ruoloEsistenteSuDb = ruoloServiceInstance.cercaPerDescrizioneECodice("Administrator", "ROLE_ADMIN");
 		if (ruoloEsistenteSuDb == null)
-			throw new RuntimeException("testCollegaUtenteARuoloEsistente fallito: ruolo inesistente ");
+			throw new RuntimeException("testContaUtentiAdmin fallito: ruolo inesistente ");
 
 		Utente primoUtente = new Utente("vasco.rossi", "rty", "vasco", "rossi", new Date());
 		utenteServiceInstance.inserisciNuovo(primoUtente);
@@ -342,14 +346,65 @@ public class ManyToManyTest {
 
 		if (utenteServiceInstance.countAllUtentiAdmin() < 2) {
 			throw new RuntimeException(
-					"testTrovaUtentiCreatiAGiugno2021 fallito: utenti trovati non corrispondono al numero aspettato ");
+					"testContaUtentiAdmin fallito: utenti trovati non corrispondono al numero aspettato ");
 		}
 
 		utenteServiceInstance.rimuoviRuoloDaUtente(primoUtente.getId(), ruoloEsistenteSuDb.getId());
 		utenteServiceInstance.rimuoviRuoloDaUtente(secondoUtente.getId(), ruoloEsistenteSuDb.getId());
 		utenteServiceInstance.rimuovi(primoUtente.getId());
 		utenteServiceInstance.rimuovi(secondoUtente.getId());
-		System.out.println(".......testTrovaUtentiCreatiAGiugno2021 fine: PASSED.............");
+		System.out.println(".......testContaUtentiAdmin fine: PASSED.............");
+	}
+
+	private static void testTrovaUtentiConPAssowordPiuCortaDiOttoCaratteri(UtenteService utenteServiceInstance)
+			throws Exception {
+		System.out.println(".......testTrovaUtentiConPAssowordPiuCortaDiOttoCaratteri inizio.............");
+
+		Utente primoUtente = new Utente("valentino.rossi", "123", "valentino", "rossi", new Date());
+		utenteServiceInstance.inserisciNuovo(primoUtente);
+
+		Utente secondoUtente = new Utente("marcello.neri", "12345", "marcello", "neri", new Date());
+		utenteServiceInstance.inserisciNuovo(secondoUtente);
+
+		List<Utente> listaUtenti = utenteServiceInstance.listAllUtentiConPasswordConMenoDiOttoCaratteri();
+		if (listaUtenti.size() < 2) {
+			throw new RuntimeException(
+					"testTrovaUtentiConPAssowordPiuCortaDiOttoCaratteri fallito: utenti trovati non corrispondono al numero aspettato ");
+		}
+
+		utenteServiceInstance.rimuovi(primoUtente.getId());
+		utenteServiceInstance.rimuovi(secondoUtente.getId());
+		System.out.println(".......testTrovaUtentiConPAssowordPiuCortaDiOttoCaratteri fine: PASSED.............");
+	}
+
+	private static void testTrovaSeCiSonoUtentiAdminEDisabilitati(UtenteService utenteServiceInstance,
+			RuoloService ruoloServiceInstance) throws Exception {
+		System.out.println(".......testTrovaUtentiAdminEDisabilitati inizio.............");
+
+		Ruolo ruoloEsistenteSuDb = ruoloServiceInstance.cercaPerDescrizioneECodice("Administrator", "ROLE_ADMIN");
+		if (ruoloEsistenteSuDb == null)
+			throw new RuntimeException("testTrovaUtentiAdminEDisabilitati fallito: ruolo inesistente ");
+
+		Utente primoUtente = new Utente("valentino.rossi", "123", "valentino", "rossi", new Date());
+		primoUtente.setStato(StatoUtente.DISABILITATO);
+		utenteServiceInstance.inserisciNuovo(primoUtente);
+		utenteServiceInstance.aggiungiRuolo(primoUtente, ruoloEsistenteSuDb);
+
+		Utente secondoUtente = new Utente("marcello.neri", "12345", "marcello", "neri", new Date());
+		secondoUtente.setStato(StatoUtente.DISABILITATO);
+		utenteServiceInstance.inserisciNuovo(secondoUtente);
+		utenteServiceInstance.aggiungiRuolo(secondoUtente, ruoloEsistenteSuDb);
+
+		if (utenteServiceInstance.cercaSeTraGliUtentiDisabilitatiCEUnAdmin()) {
+			throw new RuntimeException(
+					"testTrovaUtentiAdminEDisabilitati fallito: utenti trovati non corrispondono al numero aspettato ");
+		}
+
+		utenteServiceInstance.rimuoviRuoloDaUtente(primoUtente.getId(), ruoloEsistenteSuDb.getId());
+		utenteServiceInstance.rimuoviRuoloDaUtente(secondoUtente.getId(), ruoloEsistenteSuDb.getId());
+		utenteServiceInstance.rimuovi(primoUtente.getId());
+		utenteServiceInstance.rimuovi(secondoUtente.getId());
+		System.out.println(".......testTrovaUtentiAdminEDisabilitati fine: PASSED.............");
 	}
 
 }
