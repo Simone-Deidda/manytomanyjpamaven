@@ -1,6 +1,9 @@
 package it.manytomanyjpamaven.test;
 
 import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import it.manytomanyjpamaven.dao.EntityManagerUtil;
 import it.manytomanyjpamaven.model.Ruolo;
@@ -53,6 +56,9 @@ public class ManyToManyTest {
 
 			testCaricaRuoloPerId(ruoloServiceInstance, utenteServiceInstance);
 			System.out.println("In tabella Ruolo ci sono " + ruoloServiceInstance.listAll().size() + " elementi.");
+			
+			testCaricaDescrizioniRuoloAppartenentiAdAlmenoUnUtente(ruoloServiceInstance, utenteServiceInstance);
+			System.out.println("In tabella Ruolo ci sono " + ruoloServiceInstance.listAll().size() + " elementi.");
 
 		} catch (Throwable e) {
 			e.printStackTrace();
@@ -88,7 +94,7 @@ public class ManyToManyTest {
 	private static void testInserisciNuovoRuolo(RuoloService ruoloServiceInstance) throws Exception {
 		System.out.println(".......testInserisciNuovoRuolo inizio.............");
 
-		Ruolo utenteNuovo = new Ruolo("qualcosa", "ROLE_SOMETHING");
+		Ruolo utenteNuovo = new Ruolo("ROLE_SOMETHING", "qualcosa");
 		ruoloServiceInstance.inserisciNuovo(utenteNuovo);
 		if (utenteNuovo.getId() == null)
 			throw new RuntimeException("testInserisciNuovoRuolo fallito ");
@@ -264,6 +270,29 @@ public class ManyToManyTest {
 					"testCaricaRuoloPerId fallito: ruolo inserito non è uguale a quello ripescato dal DB ");
 
 		System.out.println(".......testCaricaRuoloPerId fine: PASSED.............");
+	}
+
+	private static void testCaricaDescrizioniRuoloAppartenentiAdAlmenoUnUtente(RuoloService ruoloServiceInstance, UtenteService utenteServiceInstance)
+			throws Exception {
+		System.out.println(".......testCaricaDescrizioniRuoloAppartenentiAdAlmenoUnUtente inizio.............");
+
+		Ruolo nuovoRuolo = new Ruolo("ROLE_NEW", "nuovo");
+		ruoloServiceInstance.inserisciNuovo(nuovoRuolo);
+		Utente primoUtente = utenteServiceInstance.listAll().get(0);
+		utenteServiceInstance.aggiungiRuolo(primoUtente, nuovoRuolo);
+		
+		Ruolo nuovoRuolo2 = new Ruolo("ROLE_NEW2", "nuovo2");
+		ruoloServiceInstance.inserisciNuovo(nuovoRuolo2);
+		Utente secondoUtente = utenteServiceInstance.listAll().get(1);
+		utenteServiceInstance.aggiungiRuolo(secondoUtente, nuovoRuolo2);
+		
+		List<String> listaDescrizioni = ruoloServiceInstance.listAllDescrizioniAventiUtenteAssociato();
+
+		if (listaDescrizioni.size() < 2)
+			throw new RuntimeException(
+					"testCaricaDescrizioniRuoloAppartenentiAdAlmenoUnUtente fallito: ruolo inserito non è uguale a quello ripescato dal DB ");
+
+		System.out.println(".......testCaricaDescrizioniRuoloAppartenentiAdAlmenoUnUtente fine: PASSED.............");
 	}
 
 }

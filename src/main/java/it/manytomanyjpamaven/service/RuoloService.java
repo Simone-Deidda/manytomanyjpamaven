@@ -6,6 +6,8 @@ import it.manytomanyjpamaven.dao.RuoloDAO;
 import it.manytomanyjpamaven.model.Ruolo;
 
 public interface RuoloService {
+	
+	// CRUD
 	public List<Ruolo> listAll() throws Exception;
 
 	public Ruolo caricaSingoloElemento(Long id) throws Exception;
@@ -15,6 +17,9 @@ public interface RuoloService {
 	public void inserisciNuovo(Ruolo ruoloInstance) throws Exception;
 
 	public void rimuovi(Long idRuoloToRemove) throws Exception;
+	
+	// operazioni di Ruolo
+	public List<String> listAllDescrizioniAventiUtenteAssociato();
 
 	public Ruolo cercaPerDescrizioneECodice(String descrizione, String codice) throws Exception;
 

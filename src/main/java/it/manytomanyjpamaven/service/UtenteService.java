@@ -9,6 +9,7 @@ import it.manytomanyjpamaven.model.Utente;
 
 public interface UtenteService {
 
+	// CRUD
 	public List<Utente> listAll() throws Exception;
 
 	public Utente caricaSingoloElemento(Long id) throws Exception;
@@ -24,6 +25,15 @@ public interface UtenteService {
 	public void rimuoviRuoloDaUtente(Long idUtente,Long idRuolo) throws Exception;
 
 	public Utente caricaUtenteSingoloConRuoli(Long id) throws Exception;
+	
+	// operazioni di Utente
+	public List<Utente> listAllUtentiCreatiAGiugno2021() throws Exception;
+	
+	public Integer countAllUtentiAdmin() throws Exception;
+	
+	public List<Utente> listAllUtentiConPasswordConMenoDiOttoCaratteri() throws Exception;
+	
+	public boolean cercaSeTraGliUtentiDisabilitatiCEUnAdmin() throws Exception;
 
 	// per injection
 	public void setUtenteDAO(UtenteDAO utenteDAO);

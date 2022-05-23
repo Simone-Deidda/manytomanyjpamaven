@@ -234,4 +234,24 @@ public class UtenteServiceImpl implements UtenteService {
 
 	}
 
+	@Override
+	public List<Utente> listAllUtentiCreatiAGiugno2021() throws Exception {
+		return null;
+	}
+
+	@Override
+	public Integer countAllUtentiAdmin() throws Exception {
+		return null;
+	}
+
+	@Override
+	public List<Utente> listAllUtentiConPasswordConMenoDiOttoCaratteri() throws Exception {
+		return null;
+	}
+
+	@Override
+	public boolean cercaSeTraGliUtentiDisabilitatiCEUnAdmin() throws Exception {
+		return false;
+	}
+
 }
