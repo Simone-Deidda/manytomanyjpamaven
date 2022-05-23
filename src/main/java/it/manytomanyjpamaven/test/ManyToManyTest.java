@@ -64,6 +64,9 @@ public class ManyToManyTest {
 			testTrovaUtentiCreatiAGiugno2021(utenteServiceInstance);
 			System.out.println("In tabella Utente ci sono " + utenteServiceInstance.listAll().size() + " elementi.");
 
+			testContaUtentiAdmin(utenteServiceInstance, ruoloServiceInstance);
+			System.out.println("In tabella Utente ci sono " + utenteServiceInstance.listAll().size() + " elementi.");
+
 		} catch (Throwable e) {
 			e.printStackTrace();
 		} finally {
@@ -316,6 +319,34 @@ public class ManyToManyTest {
 					"testTrovaUtentiCreatiAGiugno2021 fallito: utenti trovati non corrispondono al numero aspettato ");
 		}
 
+		utenteServiceInstance.rimuovi(primoUtente.getId());
+		utenteServiceInstance.rimuovi(secondoUtente.getId());
+		System.out.println(".......testTrovaUtentiCreatiAGiugno2021 fine: PASSED.............");
+	}
+
+	private static void testContaUtentiAdmin(UtenteService utenteServiceInstance, RuoloService ruoloServiceInstance)
+			throws Exception {
+		System.out.println(".......testTrovaUtentiCreatiAGiugno2021 inizio.............");
+
+		Ruolo ruoloEsistenteSuDb = ruoloServiceInstance.cercaPerDescrizioneECodice("Administrator", "ROLE_ADMIN");
+		if (ruoloEsistenteSuDb == null)
+			throw new RuntimeException("testCollegaUtenteARuoloEsistente fallito: ruolo inesistente ");
+
+		Utente primoUtente = new Utente("vasco.rossi", "rty", "vasco", "rossi", new Date());
+		utenteServiceInstance.inserisciNuovo(primoUtente);
+		utenteServiceInstance.aggiungiRuolo(primoUtente, ruoloEsistenteSuDb);
+
+		Utente secondoUtente = new Utente("gennaro.cippi", "rty", "gennaro", "cippi", new Date());
+		utenteServiceInstance.inserisciNuovo(secondoUtente);
+		utenteServiceInstance.aggiungiRuolo(secondoUtente, ruoloEsistenteSuDb);
+
+		if (utenteServiceInstance.countAllUtentiAdmin() < 2) {
+			throw new RuntimeException(
+					"testTrovaUtentiCreatiAGiugno2021 fallito: utenti trovati non corrispondono al numero aspettato ");
+		}
+
+		utenteServiceInstance.rimuoviRuoloDaUtente(primoUtente.getId(), ruoloEsistenteSuDb.getId());
+		utenteServiceInstance.rimuoviRuoloDaUtente(secondoUtente.getId(), ruoloEsistenteSuDb.getId());
 		utenteServiceInstance.rimuovi(primoUtente.getId());
 		utenteServiceInstance.rimuovi(secondoUtente.getId());
 		System.out.println(".......testTrovaUtentiCreatiAGiugno2021 fine: PASSED.............");

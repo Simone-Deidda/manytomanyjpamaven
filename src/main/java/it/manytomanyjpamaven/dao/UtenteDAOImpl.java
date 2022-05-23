@@ -74,4 +74,10 @@ public class UtenteDAOImpl implements UtenteDAO {
 		return query.getResultList();
 	}
 
+	@Override
+	public Integer countAdmins() {
+		TypedQuery<Utente> query = entityManager.createQuery("SELECT u FROM Utente u JOIN u.ruoli r WHERE r.codice = 'ROLE_ADMIN'", Utente.class);
+		return query.getResultList().size();
+	}
+
 }

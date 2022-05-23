@@ -239,10 +239,7 @@ public class UtenteServiceImpl implements UtenteService {
 		EntityManager entityManager = EntityManagerUtil.getEntityManager();
 
 		try {
-			// uso l'injection per il dao
 			utenteDAO.setEntityManager(entityManager);
-
-			// eseguo quello che realmente devo fare
 			return utenteDAO.listAllUserCreatedOnGiugno2021();
 
 		} catch (Exception e) {
@@ -255,7 +252,18 @@ public class UtenteServiceImpl implements UtenteService {
 
 	@Override
 	public Integer countAllUtentiAdmin() throws Exception {
-		return null;
+		EntityManager entityManager = EntityManagerUtil.getEntityManager();
+
+		try {
+			utenteDAO.setEntityManager(entityManager);
+			return utenteDAO.countAdmins();
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw e;
+		} finally {
+			EntityManagerUtil.closeEntityManager(entityManager);
+		}
 	}
 
 	@Override
