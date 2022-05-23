@@ -1,5 +1,6 @@
 package it.manytomanyjpamaven.test;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -56,9 +57,12 @@ public class ManyToManyTest {
 
 			testCaricaRuoloPerId(ruoloServiceInstance, utenteServiceInstance);
 			System.out.println("In tabella Ruolo ci sono " + ruoloServiceInstance.listAll().size() + " elementi.");
-			
+
 			testCaricaDescrizioniRuoloAppartenentiAdAlmenoUnUtente(ruoloServiceInstance, utenteServiceInstance);
 			System.out.println("In tabella Ruolo ci sono " + ruoloServiceInstance.listAll().size() + " elementi.");
+
+			testTrovaUtentiCreatiAGiugno2021(utenteServiceInstance);
+			System.out.println("In tabella Utente ci sono " + utenteServiceInstance.listAll().size() + " elementi.");
 
 		} catch (Throwable e) {
 			e.printStackTrace();
@@ -272,27 +276,49 @@ public class ManyToManyTest {
 		System.out.println(".......testCaricaRuoloPerId fine: PASSED.............");
 	}
 
-	private static void testCaricaDescrizioniRuoloAppartenentiAdAlmenoUnUtente(RuoloService ruoloServiceInstance, UtenteService utenteServiceInstance)
-			throws Exception {
+	private static void testCaricaDescrizioniRuoloAppartenentiAdAlmenoUnUtente(RuoloService ruoloServiceInstance,
+			UtenteService utenteServiceInstance) throws Exception {
 		System.out.println(".......testCaricaDescrizioniRuoloAppartenentiAdAlmenoUnUtente inizio.............");
 
 		Ruolo nuovoRuolo = new Ruolo("ROLE_NEW", "nuovo");
 		ruoloServiceInstance.inserisciNuovo(nuovoRuolo);
 		Utente primoUtente = utenteServiceInstance.listAll().get(0);
 		utenteServiceInstance.aggiungiRuolo(primoUtente, nuovoRuolo);
-		
+
 		Ruolo nuovoRuolo2 = new Ruolo("ROLE_NEW2", "nuovo2");
 		ruoloServiceInstance.inserisciNuovo(nuovoRuolo2);
 		Utente secondoUtente = utenteServiceInstance.listAll().get(1);
 		utenteServiceInstance.aggiungiRuolo(secondoUtente, nuovoRuolo2);
-		
+
 		List<String> listaDescrizioni = ruoloServiceInstance.listAllDescrizioniAventiUtenteAssociato();
 
 		if (listaDescrizioni.size() < 2)
 			throw new RuntimeException(
-					"testCaricaDescrizioniRuoloAppartenentiAdAlmenoUnUtente fallito: ruolo inserito non è uguale a quello ripescato dal DB ");
+					"testCaricaDescrizioniRuoloAppartenentiAdAlmenoUnUtente fallito: ruoli trovati non corrispondono al numero aspettato ");
 
 		System.out.println(".......testCaricaDescrizioniRuoloAppartenentiAdAlmenoUnUtente fine: PASSED.............");
+	}
+
+	private static void testTrovaUtentiCreatiAGiugno2021(UtenteService utenteServiceInstance) throws Exception {
+		System.out.println(".......testTrovaUtentiCreatiAGiugno2021 inizio.............");
+
+		Utente primoUtente = new Utente("valentino.rossi", "rty", "valentino", "rossi",
+				new SimpleDateFormat("dd-MM-yyyy").parse("10-06-2021"));
+		utenteServiceInstance.inserisciNuovo(primoUtente);
+
+		Utente secondoUtente = new Utente("marcello.neri", "rty", "marcello", "neri",
+				new SimpleDateFormat("dd-MM-yyyy").parse("21-06-2021"));
+		utenteServiceInstance.inserisciNuovo(secondoUtente);
+
+		List<Utente> listaUtenti = utenteServiceInstance.listAllUtentiCreatiAGiugno2021();
+		if (listaUtenti.size() < 2) {
+			throw new RuntimeException(
+					"testTrovaUtentiCreatiAGiugno2021 fallito: utenti trovati non corrispondono al numero aspettato ");
+		}
+
+		utenteServiceInstance.rimuovi(primoUtente.getId());
+		utenteServiceInstance.rimuovi(secondoUtente.getId());
+		System.out.println(".......testTrovaUtentiCreatiAGiugno2021 fine: PASSED.............");
 	}
 
 }

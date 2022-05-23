@@ -236,7 +236,21 @@ public class UtenteServiceImpl implements UtenteService {
 
 	@Override
 	public List<Utente> listAllUtentiCreatiAGiugno2021() throws Exception {
-		return null;
+		EntityManager entityManager = EntityManagerUtil.getEntityManager();
+
+		try {
+			// uso l'injection per il dao
+			utenteDAO.setEntityManager(entityManager);
+
+			// eseguo quello che realmente devo fare
+			return utenteDAO.listAllUserCreatedOnGiugno2021();
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw e;
+		} finally {
+			EntityManagerUtil.closeEntityManager(entityManager);
+		}
 	}
 
 	@Override
